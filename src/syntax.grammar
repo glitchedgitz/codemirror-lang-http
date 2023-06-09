@@ -1,0 +1,81 @@
+@top ReqResp { (RequestLine|ResponseLine) headerList DoubleLineBreak Content }
+
+RequestLine { (InvalidMethod|Method) space RequestURI space HTTPVersion LineBreak }
+ResponseLine { HTTPVersion space StatusCode space (ReasonPhrase)? LineBreak }
+
+Content {ContentXML | ContentHTML | ContentJSON | ContentGraphQL | ContentJS | RestAPIBody | ContentUnknownSoJS }
+
+RequestURI {"/" UrlPath ("?" UrlParamList)? ("#" UrlFragment)?}
+UrlParamList { UrlParamItem* }
+UrlParamItem { UrlParamName "=" UrlParamValue "&"? }
+
+StatusCode { Statusxxx | Status1xx | Status2xx | Status3xx | Status404 | Status4xx| Status5xx }
+
+headerList { (CookieHeader | Header)* }  
+
+Header { HeaderName ":" HeaderValue LineBreak }
+CookieHeader { CookieHeaderName ":" CookieHeaderValue LineBreak }
+
+CookieHeaderValue { CookieItem* LineBreak }
+CookieItem {CookieName "=" CookieValue ";"}
+
+@tokens {
+    
+    space { " "+ }
+    
+    // Rest Body
+    BodyParamName{![ =&]+}
+    BodyParamValue{![ =&]+}
+    BodyParamItem{BodyParamName "=" BodyParamValue "&"?}
+    RestAPIBody{BodyParamItem+}
+    
+    // Cookie
+    CookieName {![=\r\n]+}
+    CookieValue {![;\r\n]+}
+    
+    // URL
+    UrlPath {![ =&?#]+ }
+    UrlParamName { ![ =&?#]+ }
+    UrlParamValue { ![ =&?#]+ }
+    UrlFragment { ![ ]+ }
+    
+    // Break b/w headers and content
+    LineBreak { ("\r\n"|"\n") }
+    DoubleLineBreak { (LineBreak)+ }
+    
+    CookieHeaderName {"Cookie" | "Set-Cookie" | "cookie" | "set-cookie"}
+    @precedence{CookieHeaderName HeaderName }
+
+    // Headers
+    HeaderName { (@asciiLetter | @digit | "-" | "_" | " ")+}
+    HeaderValue { ![\r\n]+}
+    @precedence { HeaderName HeaderValue }
+    
+    // Response
+    Statusxxx { @digit @digit @digit}
+    Status1xx { "1" @digit @digit}
+    Status2xx { "2" @digit @digit}
+    Status3xx { "3" @digit @digit}
+    Status404 {"404"}
+    Status4xx { "4" @digit @digit}
+    @precedence {Status1xx Status2xx Status3xx Status404 Status4xx Status5xx Statusxxx }
+    Status5xx { "5" @digit @digit}
+    Version { @digit "." @digit }
+    ReasonPhrase { ![\r\n]+ }
+    
+    // Content
+    ContentXML     { "<?xml" ![]* }
+    ContentHTML     { "<" ![]* }
+    ContentJSON     { "{" ![]* }
+    ContentJS     { "(" ![]* }
+    ContentGraphQL  { ("query" | "mutation" | "subscription") ![\r\n]* }
+    ContentUnknownSoJS  { ![]+ }
+    @precedence { ContentJSON ContentXML ContentHTML ContentGraphQL ContentJS RestAPIBody ContentUnknownSoJS }
+
+    Method { "GET"|"POST"|"PUT"|"DELETE"|"HEAD"|"OPTIONS"|"CONNECT"|"TRACE"|"PATCH" }
+    InvalidMethod { @asciiLetter+ }
+    @precedence { Method InvalidMethod }
+
+    HTTPVersion { "HTTP/" Version }
+    @precedence { HTTPVersion InvalidMethod }
+}
