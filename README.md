@@ -1,21 +1,37 @@
-# Http Request/Response Lang Parser for Codemirror
+# Http Request/Response Lezer Parser for Codemirror v6
+<img src="image.png">
 
-## Features
+> *Initially created for [GRROXY](https://github.com/glitchedgitz/grroxy)*
 
-- One lang for request/response
+### Features
+- One parser for request/response
 - Auto detect and parse body of request/response
 - `Param=value` highlight for URI and Cookies/Set-Cookies 
 - Autocomplete Headers and Methods
 
-## Body Languages
+### Install
 
-- HTML
-  JSON
-  JavaScript
-  JS
-  XML
-  CSS: css().language.parser,
+```
+npm i codemirror-lang-http
+```
 
-## Todo
+### Usage
+Just push it in your extensions
+```js
+EditorState.create({
+    extensions: [
+    // other extensions
+    http()
+    ],
+}),
+```
 
-- Detect GraphQL
+
+### Supported Body Languages 
+`HTML`, `JSON`, `JavaScript`, `JS`, `XML`
+
+### Todo
+`GraphQL`
+
+
+
