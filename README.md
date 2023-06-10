@@ -8,6 +8,7 @@
 - Auto detect and parse body of request/response
 - `Param=value` highlight for URI and Cookies/Set-Cookies 
 - Autocomplete Headers and Methods
+- Doesn't depend on content-type header
 
 ### Install
 
@@ -18,6 +19,9 @@ npm i codemirror-lang-http
 ### Usage
 Just push it in your extensions
 ```js
+import { http } from "codemirror-lang-http";
+// ...
+
 EditorState.create({
     extensions: [
     // other extensions
